@@ -18,7 +18,39 @@ import MaterialDetailScreen from '../screens/MaterialDetailScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 
 const Stack = createNativeStackNavigator(); const Tab = createBottomTabNavigator();
-const linking = { prefixes: [Linking.createURL('/'), 'ifn666://', 'https://ifn666.com'], config: { screens: { MainTabs: { screens: { Home: '', Tutorials: { screens: { TutorialsList: 'tutorials', TutorialDetail: 'tutorials/:id' } }, Categories: { screens: { CategoriesList: 'categories', CategoryDetail: 'categories/:id' } }, Materials: { screens: { MaterialsList: 'materials', MaterialDetail: 'materials/:id' } }, Profile: { screens: { ProfileMain: 'profile', Login: 'login', Register: 'register' } } } } } } };
+const linking = {
+  prefixes: [Linking.createURL('/'), 'ifn666://', 'https://ifn666.com'],
+  config: {
+    screens: {
+      Home: '',
+      Tutorials: {
+        screens: {
+          TutorialsList: 'tutorials',
+          TutorialDetail: 'tutorials/:id',
+        },
+      },
+      Categories: {
+        screens: {
+          CategoriesList: 'categories',
+          CategoryDetail: 'categories/:id',
+        },
+      },
+      Materials: {
+        screens: {
+          MaterialsList: 'materials',
+          MaterialDetail: 'materials/:id',
+        },
+      },
+      Profile: {
+        screens: {
+          ProfileMain: 'profile',
+          Login: 'login',
+          Register: 'register',
+        },
+      },
+    },
+  },
+};
 const screenOptions = { headerStyle: { backgroundColor: colors.surface }, headerTintColor: colors.text, contentStyle: { backgroundColor: colors.background } };
 function TutorialsStack(){return <Stack.Navigator screenOptions={screenOptions}><Stack.Screen name="TutorialsList" component={TutorialsScreen} options={{title:'Tutorials'}}/><Stack.Screen name="TutorialDetail" component={TutorialDetailScreen}/><Stack.Screen name="TutorialForm" component={TutorialFormScreen}/></Stack.Navigator>;}
 function CategoriesStack(){return <Stack.Navigator screenOptions={screenOptions}><Stack.Screen name="CategoriesList" component={CategoriesScreen}/><Stack.Screen name="CategoryDetail" component={CategoryDetailScreen}/></Stack.Navigator>;}
