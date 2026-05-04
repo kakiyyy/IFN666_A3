@@ -13,70 +13,34 @@ function parseLinkHeader(header) {
 }
 
 function authHeaders(token) {
+  if (!token) throw new Error('Please login first.');
   return { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
 }
 
-export async function getCategories(token, { page = 1, search = '', sort = 'name_asc' } = {}) {
-  const params = new URLSearchParams({ page, sort });
+export async function getCategories({ page = 1, search = '', sort = 'name_asc' } = {}) {
+  const params = new URLSearchParams({ page: String(page), sort });
   if (search) params.set('search', search);
-  const res = await fetch(`${BASE_URL}/categories?${params}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await fetch(`${BASE_URL}/categories?${params}`);
   const data = await res.json();
   if (!res.ok) throw new Error(extractError(data));
-  const totalPages = parseLinkHeader(res.headers.get('Link'));
-  return { categories: data, totalPages };
+  return { categories: data, totalPages: parseLinkHeader(res.headers.get('Link')) };
 }
 
-export async function getCategory(token, id) {
-  const res = await fetch(`${BASE_URL}/categories/${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+export async function getCategory(id) {
+  const res = await fetch(`${BASE_URL}/categories/${id}`);
   const data = await res.json();
   if (!res.ok) throw new Error(extractError(data));
   return data;
 }
 
-export async function getCategoryTutorials(token, id, { page = 1 } = {}) {
-  const params = new URLSearchParams({ page });
-  const res = await fetch(`${BASE_URL}/categories/${id}/tutorials?${params}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+export async function getCategoryTutorials(id, { page = 1, sort = 'name_asc' } = {}) {
+  const params = new URLSearchParams({ page: String(page), sort });
+  const res = await fetch(`${BASE_URL}/categories/${id}/tutorials?${params}`);
   const data = await res.json();
   if (!res.ok) throw new Error(extractError(data));
-  const totalPages = parseLinkHeader(res.headers.get('Link'));
-  return { tutorials: data, totalPages };
+  return { tutorials: data, totalPages: parseLinkHeader(res.headers.get('Link')) };
 }
 
-export async function createCategory(token, body) {
-  const res = await fetch(`${BASE_URL}/categories`, {
-    method: 'POST',
-    headers: authHeaders(token),
-    body: JSON.stringify(body),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(extractError(data));
-  return data;
-}
-
-export async function updateCategory(token, id, body) {
-  const res = await fetch(`${BASE_URL}/categories/${id}`, {
-    method: 'PUT',
-    headers: authHeaders(token),
-    body: JSON.stringify(body),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(extractError(data));
-  return data;
-}
-
-export async function deleteCategory(token, id) {
-  const res = await fetch(`${BASE_URL}/categories/${id}`, {
-    method: 'DELETE',
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) {
-    const data = await res.json();
-    throw new Error(extractError(data));
-  }
-}
+export async function createCategory(token, body) { const res = await fetch(`${BASE_URL}/categories`, { method: 'POST', headers: authHeaders(token), body: JSON.stringify(body) }); const data = await res.json(); if (!res.ok) throw new Error(extractError(data)); return data; }
+export async function updateCategory(token, id, body) { const res = await fetch(`${BASE_URL}/categories/${id}`, { method: 'PUT', headers: authHeaders(token), body: JSON.stringify(body) }); const data = await res.json(); if (!res.ok) throw new Error(extractError(data)); return data; }
+export async function deleteCategory(token, id) { const res = await fetch(`${BASE_URL}/categories/${id}`, { method: 'DELETE', headers: authHeaders(token) }); if (!res.ok) { const data = await res.json(); throw new Error(extractError(data)); } }

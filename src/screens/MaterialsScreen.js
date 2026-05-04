@@ -23,7 +23,7 @@ import Pagination from '../components/Pagination';
 import ErrorMessage from '../components/ErrorMessage';
 import { colors } from '../constants/colors';
 
-export default function MaterialsScreen() {
+export default function MaterialsScreen({ navigation }) {
   const { token, userId } = useAuth();
   const [materials, setMaterials] = useState([]);
   const [page, setPage] = useState(1);
@@ -47,7 +47,7 @@ export default function MaterialsScreen() {
     setLoading(true);
     setError('');
     try {
-      const result = await getMaterials(token, { page: p, search: s, sort: 'name_asc' });
+      const result = await getMaterials({ page: p, search: s, sort: 'name_asc' });
       setMaterials(result.materials);
       setTotalPages(result.totalPages);
     } catch (e) {
@@ -120,7 +120,7 @@ export default function MaterialsScreen() {
   const renderItem = ({ item }) => {
     const isOwner = String(item.owner) === String(userId);
     return (
-      <View style={styles.card}>
+      <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('MaterialDetail', { id: item._id })}>
         <View style={styles.cardHeader}>
           <Text style={styles.cardTitle}>{item.name}</Text>
           {isOwner && (
@@ -139,7 +139,7 @@ export default function MaterialsScreen() {
             {item.purchaseSource}
           </Text>
         ) : null}
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -177,9 +177,9 @@ export default function MaterialsScreen() {
         />
       )}
 
-      <TouchableOpacity style={styles.fab} onPress={openCreate}>
+      {token ? <TouchableOpacity style={styles.fab} onPress={openCreate}>
         <Text style={styles.fabText}>+</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> : null}
 
       <Modal visible={modalVisible} transparent animationType="fade">
         <Pressable style={styles.modalOverlay} onPress={() => setModalVisible(false)}>

@@ -47,7 +47,7 @@ export default function CategoriesScreen({ navigation }) {
     setLoading(true);
     setError('');
     try {
-      const result = await getCategories(token, { page: p, search: s, sort: 'name_asc' });
+      const result = await getCategories({ page: p, search: s, sort: 'name_asc' });
       setCategories(result.categories);
       setTotalPages(result.totalPages);
     } catch (e) {
@@ -180,9 +180,9 @@ export default function CategoriesScreen({ navigation }) {
         />
       )}
 
-      <TouchableOpacity style={styles.fab} onPress={openCreate}>
+      {token ? <TouchableOpacity style={styles.fab} onPress={openCreate}>
         <Text style={styles.fabText}>+</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> : null}
 
       <Modal visible={modalVisible} transparent animationType="fade">
         <Pressable style={styles.modalOverlay} onPress={() => setModalVisible(false)}>
