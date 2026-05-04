@@ -99,9 +99,7 @@ export default function TutorialsScreen({ navigation }) {
           onChangeText={handleSearch}
           returnKeyType="search"
         />
-        <TouchableOpacity style={styles.sortBtn} onPress={() => setShowSort((v) => !v)}>
-          <Text style={styles.sortBtnText}>Sort</Text>
-        </TouchableOpacity> : null}
+        <TouchableOpacity style={styles.sortBtn} onPress={() => setShowSort((v) => !v)}><Text style={styles.sortBtnText}>Sort</Text></TouchableOpacity>
       </View>
 
       {showSort && (
@@ -142,12 +140,14 @@ export default function TutorialsScreen({ navigation }) {
         />
       )}
 
-      {token ? <TouchableOpacity
-        style={styles.fab}
-        onPress={() => navigation.navigate('TutorialForm', {})}
-      >
-        <Text style={styles.fabText}>+</Text>
-      </TouchableOpacity>
+      {token ? (
+        <TouchableOpacity
+          style={styles.fab}
+          onPress={() => navigation.navigate('TutorialForm', {})}
+        >
+          <Text style={styles.fabText}>+</Text>
+        </TouchableOpacity>
+      ) : null}
     </View>
   );
 }
