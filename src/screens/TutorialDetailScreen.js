@@ -27,7 +27,7 @@ export default function TutorialDetailScreen({ route, navigation }) {
     setLoading(true);
     setError('');
     try {
-      const data = await getTutorial(token, id);
+      const data = await getTutorial(id);
       setTutorial(data);
     } catch (e) {
       setError(e.message);

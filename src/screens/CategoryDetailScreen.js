@@ -29,8 +29,8 @@ export default function CategoryDetailScreen({ route, navigation }) {
     setError('');
     try {
       const [cat, tutsResult] = await Promise.all([
-        getCategory(token, id),
-        getCategoryTutorials(token, id, { page }),
+        getCategory(id),
+        getCategoryTutorials(id, { page }),
       ]);
       setCategory(cat);
       setTutorials(tutsResult.tutorials);

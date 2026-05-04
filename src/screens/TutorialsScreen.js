@@ -43,7 +43,7 @@ export default function TutorialsScreen({ navigation }) {
     setLoading(true);
     setError('');
     try {
-      const result = await getTutorials(token, { page: p, search: s, sort: so });
+      const result = await getTutorials({ page: p, search: s, sort: so });
       setTutorials(result.tutorials);
       setTotalPages(result.totalPages);
     } catch (e) {
@@ -101,7 +101,7 @@ export default function TutorialsScreen({ navigation }) {
         />
         <TouchableOpacity style={styles.sortBtn} onPress={() => setShowSort((v) => !v)}>
           <Text style={styles.sortBtnText}>Sort</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> : null}
       </View>
 
       {showSort && (
@@ -142,7 +142,7 @@ export default function TutorialsScreen({ navigation }) {
         />
       )}
 
-      <TouchableOpacity
+      {token ? <TouchableOpacity
         style={styles.fab}
         onPress={() => navigation.navigate('TutorialForm', {})}
       >
