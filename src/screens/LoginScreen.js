@@ -51,7 +51,7 @@ export default function LoginScreen({ navigation }) {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        <Text style={styles.title}>Kaki</Text>
+        <Text style={styles.title}>Login</Text>
         <Text style={styles.subtitle}>Handcraft Tutorials</Text>
         <TextInput
           style={styles.input}
