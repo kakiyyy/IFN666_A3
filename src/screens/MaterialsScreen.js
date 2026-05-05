@@ -29,6 +29,7 @@ export default function MaterialsScreen({ navigation }) {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState('');
+  const [sort, setSort] = useState('name_asc');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -39,15 +40,15 @@ export default function MaterialsScreen({ navigation }) {
   const [formError, setFormError] = useState('');
   const [saving, setSaving] = useState(false);
 
-  const stateRef = useRef({ page, search });
-  stateRef.current = { page, search };
+  const stateRef = useRef({ page, search, sort });
+  stateRef.current = { page, search, sort };
 
   const load = useCallback(async () => {
-    const { page: p, search: s } = stateRef.current;
+    const { page: p, search: s, sort: so } = stateRef.current;
     setLoading(true);
     setError('');
     try {
-      const result = await getMaterials({ page: p, search: s, sort: 'name_asc' });
+      const result = await getMaterials({ page: p, search: s, sort: so });
       setMaterials(result.materials);
       setTotalPages(result.totalPages);
     } catch (e) {
@@ -60,7 +61,7 @@ export default function MaterialsScreen({ navigation }) {
   useFocusEffect(
     useCallback(() => {
       load();
-    }, [load, page, search])
+    }, [load, page, search, sort])
   );
 
   const openCreate = () => {
@@ -146,6 +147,21 @@ export default function MaterialsScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.toolbar}>
+        <View style={styles.sortRow}>
+          <Text style={styles.sortLabel}>Sort:</Text>
+          <TouchableOpacity
+            style={[styles.sortBtn, sort === 'name_asc' && styles.sortBtnActive]}
+            onPress={() => { setSort('name_asc'); setPage(1); }}
+          >
+            <Text style={[styles.sortBtnText, sort === 'name_asc' && styles.sortBtnTextActive]}>Name A-Z</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.sortBtn, sort === 'name_desc' && styles.sortBtnActive]}
+            onPress={() => { setSort('name_desc'); setPage(1); }}
+          >
+            <Text style={[styles.sortBtnText, sort === 'name_desc' && styles.sortBtnTextActive]}>Name Z-A</Text>
+          </TouchableOpacity>
+        </View>
         <TextInput
           style={styles.searchInput}
           placeholder="Search materials…"
@@ -212,7 +228,13 @@ export default function MaterialsScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  toolbar: { padding: 12 },
+  toolbar: { padding: 12, gap: 10 },
+  sortRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  sortLabel: { color: colors.muted, fontSize: 14 },
+  sortBtn: { borderWidth: 1, borderColor: colors.border, borderRadius: 16, paddingHorizontal: 10, paddingVertical: 6, backgroundColor: colors.surface },
+  sortBtnActive: { backgroundColor: colors.primary, borderColor: colors.primary },
+  sortBtnText: { color: colors.text, fontSize: 13 },
+  sortBtnTextActive: { color: '#fff' },
   searchInput: {
     backgroundColor: colors.surface,
     color: colors.text,

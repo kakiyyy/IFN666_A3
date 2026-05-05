@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+  Alert,
   View,
   Text,
   TextInput,
@@ -10,16 +11,12 @@ import {
   ScrollView,
 } from 'react-native';
 import { register } from '../services/authService';
-import { login as loginService } from '../services/authService';
-import { useAuth } from '../context/AuthContext';
 import ErrorMessage from '../components/ErrorMessage';
 import { colors } from '../constants/colors';
 
 export default function RegisterScreen({ navigation }) {
-  const { login: setToken } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [confirm, setConfirm] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -29,15 +26,15 @@ export default function RegisterScreen({ navigation }) {
       setError('Username and password are required.');
       return;
     }
-    if (password !== confirm) {
-      setError('Passwords do not match.');
-      return;
-    }
     setLoading(true);
     try {
       await register(username.trim(), password);
-      const token = await loginService(username.trim(), password);
-      await setToken(token);
+      Alert.alert('Success', 'Register successful. Please login.', [
+        {
+          text: 'OK',
+          onPress: () => navigation.navigate('Login'),
+        },
+      ]);
     } catch (e) {
       setError(e.message);
     } finally {
@@ -66,14 +63,6 @@ export default function RegisterScreen({ navigation }) {
           placeholderTextColor={colors.muted}
           value={password}
           onChangeText={setPassword}
-          secureTextEntry
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Confirm Password"
-          placeholderTextColor={colors.muted}
-          value={confirm}
-          onChangeText={setConfirm}
           secureTextEntry
         />
         <ErrorMessage message={error} />

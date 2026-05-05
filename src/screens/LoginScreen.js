@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+  Alert,
   View,
   Text,
   TextInput,
@@ -31,6 +32,12 @@ export default function LoginScreen({ navigation }) {
     try {
       const token = await login(username.trim(), password);
       await setToken(token);
+      Alert.alert('Success', 'Login successful', [
+        {
+          text: 'OK',
+          onPress: () => navigation.getParent()?.navigate('Home'),
+        },
+      ]);
     } catch (e) {
       setError(e.message);
     } finally {
