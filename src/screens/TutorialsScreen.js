@@ -11,7 +11,6 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
 import { getTutorials } from '../services/tutorialService';
-import DifficultyBadge from '../components/DifficultyBadge';
 import Pagination from '../components/Pagination';
 import { colors } from '../constants/colors';
 
@@ -75,16 +74,10 @@ export default function TutorialsScreen({ navigation }) {
       style={styles.card}
       onPress={() => navigation.navigate('TutorialDetail', { id: item._id })}
     >
-      <Text style={styles.cardTitle}>{item.title}</Text>
-      <View style={styles.cardRow}>
-        <DifficultyBadge difficulty={item.difficulty} />
-        <Text style={styles.cardMeta}>{item.AverageTimeSpentMinutes} min</Text>
-      </View>
-      {item.categories?.length > 0 && (
-        <Text style={styles.cardCats} numberOfLines={1}>
-          {item.categories.map((c) => c.name).join(', ')}
-        </Text>
-      )}
+      <Text style={styles.cardLine}><Text style={styles.cardLabel}>Title:</Text> {item.title}</Text>
+      <Text style={styles.cardLine}><Text style={styles.cardLabel}>Difficulty:</Text> {item.difficulty || 'N/A'}</Text>
+      <Text style={styles.cardLine}><Text style={styles.cardLabel}>Time:</Text> {item.AverageTimeSpentMinutes ?? 0} minutes</Text>
+      <Text style={styles.cardLine} numberOfLines={2}><Text style={styles.cardLabel}>Category:</Text> {item.categories?.length ? item.categories.map((c) => c.name).join(', ') : 'None'}</Text>
     </TouchableOpacity>
   );
 
@@ -203,10 +196,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  cardTitle: { color: colors.text, fontSize: 16, fontWeight: '600', marginBottom: 6 },
-  cardRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 },
-  cardMeta: { color: colors.muted, fontSize: 12 },
-  cardCats: { color: colors.muted, fontSize: 12, marginTop: 2 },
+  cardLine: { color: colors.text, fontSize: 14, marginBottom: 4 },
+  cardLabel: { fontWeight: '700', color: colors.primary },
   loader: { flex: 1 },
   errorText: { color: colors.danger, textAlign: 'center', margin: 24 },
   emptyText: { color: colors.muted, textAlign: 'center', marginTop: 40 },

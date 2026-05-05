@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   TouchableOpacity,
+  Share,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
@@ -48,6 +49,14 @@ export default function CategoryDetailScreen({ route, navigation }) {
     }, [load])
   );
 
+  const onShare = async () => {
+    if (!category) return;
+    await Share.share({
+      title: category.name,
+      message: `Category: ${category.name}\nDescription: ${category.description || 'N/A'}`,
+    });
+  };
+
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={styles.card}
@@ -88,6 +97,9 @@ export default function CategoryDetailScreen({ route, navigation }) {
           {category.description ? (
             <Text style={styles.desc}>{category.description}</Text>
           ) : null}
+          <TouchableOpacity style={styles.shareBtn} onPress={onShare}>
+            <Text style={styles.shareBtnText}>Share</Text>
+          </TouchableOpacity>
         </View>
       )}
 
@@ -121,7 +133,9 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.border,
   },
   title: { fontSize: 22, fontWeight: '700', color: colors.text, marginBottom: 4 },
-  desc: { color: colors.muted, fontSize: 14 },
+  desc: { color: colors.muted, fontSize: 14, marginBottom: 10 },
+  shareBtn: { backgroundColor: colors.primary, borderRadius: 8, paddingVertical: 10, alignItems: 'center' },
+  shareBtnText: { color: '#fff', fontWeight: '700' },
   sectionLabel: {
     color: colors.primary,
     fontWeight: '600',

@@ -10,7 +10,6 @@ import {
   Share,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import { getTutorial, deleteTutorial } from '../services/tutorialService';
 import DifficultyBadge from '../components/DifficultyBadge';
@@ -96,10 +95,10 @@ export default function TutorialDetailScreen({ route, navigation }) {
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.headerRow}>
         <Text style={styles.title}>{tutorial.title}</Text>
-        <TouchableOpacity onPress={handleShare} style={styles.shareBtn}>
-          <Ionicons name="share-outline" size={22} color={colors.primary} />
-        </TouchableOpacity>
       </View>
+      <TouchableOpacity onPress={handleShare} style={styles.shareBtn}>
+        <Text style={styles.shareBtnText}>Share</Text>
+      </TouchableOpacity>
 
       <View style={styles.metaRow}>
         <DifficultyBadge difficulty={tutorial.difficulty} />
@@ -173,7 +172,8 @@ const styles = StyleSheet.create({
   center: { flex: 1, backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' },
   headerRow: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 10 },
   title: { flex: 1, fontSize: 22, fontWeight: '700', color: colors.text, marginRight: 8 },
-  shareBtn: { padding: 4 },
+  shareBtn: { backgroundColor: colors.primary, borderRadius: 8, paddingVertical: 10, alignItems: 'center', marginBottom: 12 },
+  shareBtnText: { color: '#fff', fontWeight: '700' },
   metaRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 16 },
   metaText: { color: colors.muted, fontSize: 14 },
   section: { marginBottom: 20 },
