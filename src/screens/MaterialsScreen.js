@@ -210,7 +210,7 @@ export default function MaterialsScreen({ navigation }) {
             />
             <TextInput
               style={styles.modalInput}
-              placeholder="Purchase Source (URL or store)"
+              placeholder="Purchase Source"
               placeholderTextColor={colors.muted}
               value={formSource}
               onChangeText={setFormSource}

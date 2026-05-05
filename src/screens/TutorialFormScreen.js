@@ -164,12 +164,12 @@ export default function TutorialFormScreen({ route, navigation }) {
       <Text style={styles.label}>Time (minutes) *</Text>
       <TextInput style={styles.input} value={time} onChangeText={setTime} placeholder="e.g. 60" placeholderTextColor={colors.muted} keyboardType="numeric" />
 
-      <Text style={styles.label}>Difficulty</Text>
+      <Text style={styles.label}>Difficulty *</Text>
       <TouchableOpacity style={styles.picker} onPress={() => setShowDifficulty(true)}>
         <Text style={styles.pickerText}>{difficulty}</Text>
       </TouchableOpacity>
 
-      <Text style={styles.label}>Categories</Text>
+      <Text style={styles.label}>Categories *</Text>
       <TouchableOpacity style={styles.picker} onPress={() => setShowCategoryPicker(true)}>
         <Text style={styles.pickerText}>
           {selectedCategories.length === 0
@@ -181,7 +181,7 @@ export default function TutorialFormScreen({ route, navigation }) {
         </Text>
       </TouchableOpacity>
 
-      <Text style={styles.label}>Materials</Text>
+      <Text style={styles.label}>Materials *</Text>
       {materialEntries.map((entry, idx) => {
         const mat = allMaterials.find((m) => m._id === entry.materialId);
         return (
