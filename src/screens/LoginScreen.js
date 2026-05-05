@@ -31,7 +31,7 @@ export default function LoginScreen({ navigation }) {
     setLoading(true);
     try {
       const token = await login(username.trim(), password);
-      await setToken(token);
+      await setToken(token, username.trim());
       Alert.alert('Success', 'Login successful', [
         {
           text: 'OK',

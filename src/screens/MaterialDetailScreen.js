@@ -18,7 +18,7 @@ export default function MaterialDetailScreen({ route, navigation }) {
   }, [id]);
   useFocusEffect(useCallback(() => { load(); }, [load]));
   const isOwner = material && String(material.owner) === String(userId);
-  const onShare = async () => Share.share({ message: `Handcraft Material\n\nMaterial: ${material.name}\nPurchase source: ${material.purchaseSource || 'N/A'}\n\nOpen in app:\nhttps://ifn666.com/materials/${material._id}` });
+  const onShare = async () => Share.share({ title: material.name, message: `Material: ${material.name}\nPurchase source: ${material.purchaseSource || 'N/A'}` });
 
   if (loading) return <View style={styles.center}><ActivityIndicator color={colors.primary} /></View>;
   if (error) return <View style={styles.center}><Text style={styles.error}>{error}</Text></View>;

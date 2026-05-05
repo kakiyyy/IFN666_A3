@@ -9,7 +9,6 @@ import {
   ActivityIndicator,
   Modal,
   Pressable,
-  Alert,
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { getTutorial, createTutorial, updateTutorial } from '../services/tutorialService';
@@ -38,6 +37,7 @@ export default function TutorialFormScreen({ route, navigation }) {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [loadError, setLoadError] = useState('');
 
   const [showDifficulty, setShowDifficulty] = useState(false);
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
@@ -48,14 +48,14 @@ export default function TutorialFormScreen({ route, navigation }) {
       setLoading(true);
       try {
         const [catsResult, matsResult] = await Promise.all([
-          getCategories(token, { page: 1, sort: 'name_asc' }),
-          getMaterials(token, { page: 1, sort: 'name_asc' }),
+          getCategories({ page: 1, sort: 'name_asc' }),
+          getMaterials({ page: 1, sort: 'name_asc' }),
         ]);
         setAllCategories(catsResult.categories);
         setAllMaterials(matsResult.materials);
 
         if (isEdit) {
-          const t = await getTutorial(token, id);
+          const t = await getTutorial(id);
           setTitle(t.title ?? '');
           setDescription(t.description ?? '');
           setInstructions(t.instructions ?? '');
@@ -169,6 +169,7 @@ export default function TutorialFormScreen({ route, navigation }) {
         <Text style={styles.pickerText}>{difficulty}</Text>
       </TouchableOpacity>
 
+      {loadError ? <Text style={styles.loadError}>{loadError}</Text> : null}
       <Text style={styles.label}>Categories *</Text>
       <TouchableOpacity style={styles.picker} onPress={() => setShowCategoryPicker(true)}>
         <Text style={styles.pickerText}>
@@ -220,7 +221,7 @@ export default function TutorialFormScreen({ route, navigation }) {
         );
       })}
       <TouchableOpacity style={styles.addMatBtn} onPress={() => setShowMaterialPicker(true)}>
-        <Text style={styles.addMatBtnText}>+ Add Material</Text>
+        <Text style={styles.addMatBtnText}>Select Materials</Text>
       </TouchableOpacity>
 
       <ErrorMessage message={error} />
@@ -337,14 +338,14 @@ const styles = StyleSheet.create({
   matFields: { flexDirection: 'row', gap: 8 },
   matInput: { flex: 1, paddingVertical: 8 },
   addMatBtn: {
-    borderWidth: 1,
-    borderColor: colors.primary,
+    backgroundColor: colors.primary,
     borderRadius: 10,
     paddingVertical: 10,
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 8,
   },
-  addMatBtnText: { color: colors.primary, fontWeight: '600' },
+  addMatBtnText: { color: '#fff', fontWeight: '600' },
+  loadError: { color: colors.danger, marginTop: 8 },
   saveBtn: {
     backgroundColor: colors.primary,
     borderRadius: 10,

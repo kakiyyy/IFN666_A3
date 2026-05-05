@@ -17,34 +17,38 @@ function decodeJwt(token) {
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [username, setUsername] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    AsyncStorage.getItem('token').then((t) => {
+    Promise.all([AsyncStorage.getItem('token'), AsyncStorage.getItem('username')]).then(([t, u]) => {
       if (t) {
         setToken(t);
         const decoded = decodeJwt(t);
         setUserId(decoded?.user_id ?? null);
       }
+      if (u) setUsername(u);
       setLoading(false);
     });
   }, []);
 
-  const login = async (t) => {
-    await AsyncStorage.setItem('token', t);
+  const login = async (t, u) => {
+    await AsyncStorage.multiSet([['token', t], ['username', u ?? '']]);
     setToken(t);
     const decoded = decodeJwt(t);
     setUserId(decoded?.user_id ?? null);
+    setUsername(u ?? null);
   };
 
   const logout = async () => {
-    await AsyncStorage.removeItem('token');
+    await AsyncStorage.multiRemove(['token', 'username']);
     setToken(null);
     setUserId(null);
+    setUsername(null);
   };
 
   return (
-    <AuthContext.Provider value={{ token, userId, loading, login, logout }}>
+    <AuthContext.Provider value={{ token, userId, username, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
