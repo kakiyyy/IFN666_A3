@@ -7,10 +7,13 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
+  Pressable,
+  Alert,
+  Share,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
-import { getTutorials } from '../services/tutorialService';
+import { getTutorials, deleteTutorial } from '../services/tutorialService';
 import Pagination from '../components/Pagination';
 import { colors } from '../constants/colors';
 
@@ -56,7 +59,7 @@ function sortTutorials(items, sortValue) {
 }
 
 export default function TutorialsScreen({ navigation }) {
-  const { token } = useAuth();
+  const { token, userId } = useAuth();
   const [tutorials, setTutorials] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -101,17 +104,58 @@ export default function TutorialsScreen({ navigation }) {
     setShowSort(false);
   };
 
-  const renderItem = ({ item }) => (
-    <TouchableOpacity
+  const handleDelete = (item) => {
+    Alert.alert('Delete Tutorial', `Delete "${item.title}"?`, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await deleteTutorial(token, item._id);
+            load();
+          } catch (e) {
+            Alert.alert('Error', e.message);
+          }
+        },
+      },
+    ]);
+  };
+
+  const handleShare = async (item) => {
+    const cats = item.categories?.map((c) => c.name).join(', ') || 'None';
+    await Share.share({
+      title: item.title,
+      message: `${item.title}\nDifficulty: ${item.difficulty || 'N/A'}\nTime: ${item.AverageTimeSpentMinutes ?? 0} min\nCategories: ${cats}`,
+    });
+  };
+
+  const openQuickActions = (item, isOwner) => {
+    const options = [{ text: 'View details', onPress: () => navigation.navigate('TutorialDetail', { id: item._id }) }];
+    if (isOwner) {
+      options.push({ text: 'Edit tutorial', onPress: () => navigation.navigate('TutorialForm', { id: item._id }) });
+      options.push({ text: 'Delete tutorial', style: 'destructive', onPress: () => handleDelete(item) });
+    }
+    options.push({ text: 'Share tutorial', onPress: () => handleShare(item) });
+    options.push({ text: 'Cancel', style: 'cancel' });
+    Alert.alert(item.title, 'Quick actions', options);
+  };
+
+  const renderItem = ({ item }) => {
+    const isOwner = String(item.author) === String(userId);
+    return (
+    <Pressable
       style={styles.card}
       onPress={() => navigation.navigate('TutorialDetail', { id: item._id })}
+      onLongPress={() => openQuickActions(item, isOwner)}
+      delayLongPress={500}
     >
       <Text style={styles.cardLine}><Text style={styles.cardLabel}>Title:</Text> {item.title}</Text>
       <Text style={styles.cardLine}><Text style={styles.cardLabel}>Difficulty:</Text> {item.difficulty || 'N/A'}</Text>
       <Text style={styles.cardLine}><Text style={styles.cardLabel}>Time:</Text> {item.AverageTimeSpentMinutes ?? 0} minutes</Text>
       <Text style={styles.cardLine} numberOfLines={2}><Text style={styles.cardLabel}>Category:</Text> {item.categories?.length ? item.categories.map((c) => c.name).join(', ') : 'None'}</Text>
-    </TouchableOpacity>
-  );
+    </Pressable>
+  )};
 
   return (
     <View style={styles.container}>

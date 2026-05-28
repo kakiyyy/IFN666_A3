@@ -118,12 +118,24 @@ export default function CategoriesScreen({ navigation }) {
     ]);
   };
 
+  const openQuickActions = (cat, isOwner) => {
+    const options = [{ text: 'View details', onPress: () => navigation.navigate('CategoryDetail', { id: cat._id, name: cat.name }) }];
+    if (isOwner) {
+      options.push({ text: 'Edit category', onPress: () => openEdit(cat) });
+      options.push({ text: 'Delete category', style: 'destructive', onPress: () => handleDelete(cat) });
+    }
+    options.push({ text: 'Cancel', style: 'cancel' });
+    Alert.alert(cat.name, 'Quick actions', options);
+  };
+
   const renderItem = ({ item }) => {
     const isOwner = String(item.owner) === String(userId);
     return (
-      <TouchableOpacity
+      <Pressable
         style={styles.card}
         onPress={() => navigation.navigate('CategoryDetail', { id: item._id, name: item.name })}
+        onLongPress={() => openQuickActions(item, isOwner)}
+        delayLongPress={500}
       >
         <View style={styles.cardHeader}>
           <Text style={styles.cardTitle}>{item.name}</Text>
@@ -143,7 +155,7 @@ export default function CategoriesScreen({ navigation }) {
             {item.description}
           </Text>
         ) : null}
-      </TouchableOpacity>
+      </Pressable>
     );
   };
 
