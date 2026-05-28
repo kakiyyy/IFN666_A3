@@ -62,12 +62,34 @@ async function parseResponseSafely(res, requestUrl) {
   return data;
 }
 
-export async function getTutorials({ page = 1, search = '', sort = 'title_asc' } = {}) {
-  const params = new URLSearchParams({ page: String(page), sort });
+function buildTutorialListUrl({ page, search, sort }) {
+  const params = new URLSearchParams({ page: String(page) });
+  if (sort) params.set('sort', sort);
   if (search) params.set('search', search);
-  const requestUrl = `${BASE_URL}/tutorials?${params}`;
-  const res = await fetch(requestUrl);
-  const data = await parseResponseSafely(res, requestUrl);
+  return `${BASE_URL}/tutorials?${params}`;
+}
+
+function isInvalidSortError(error) {
+  return typeof error?.message === 'string' && error.message.toLowerCase().includes('invalid sort');
+}
+
+export async function getTutorials({ page = 1, search = '', sort = 'title_asc' } = {}) {
+  const shouldSkipSortParam = sort === 'title_asc' || sort === 'title_desc';
+  const attemptedSort = shouldSkipSortParam ? '' : sort;
+
+  let requestUrl = buildTutorialListUrl({ page, search, sort: attemptedSort });
+  let res = await fetch(requestUrl);
+  let data;
+
+  try {
+    data = await parseResponseSafely(res, requestUrl);
+  } catch (error) {
+    if (!attemptedSort || !isInvalidSortError(error)) throw error;
+    requestUrl = buildTutorialListUrl({ page, search, sort: '' });
+    res = await fetch(requestUrl);
+    data = await parseResponseSafely(res, requestUrl);
+  }
+
   return { tutorials: data, totalPages: parseLinkHeader(res.headers.get('Link')) };
 }
 
