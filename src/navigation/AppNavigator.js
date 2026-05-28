@@ -1,9 +1,8 @@
 import React from 'react';
-import { NavigationContainer, getStateFromPath as getStateFromPathDefault } from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import * as Linking from 'expo-linking';
 import { colors } from '../constants/colors';
 import HomeScreen from '../screens/HomeScreen';
 import LoginScreen from '../screens/LoginScreen';
@@ -19,49 +18,6 @@ import ProfileScreen from '../screens/ProfileScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
-
-const linking = {
-  prefixes: [
-    Linking.createURL('/'),
-    'ifn666://',
-    'https://ifn666.com',
-    'https://koala04.ifn666.com',
-  ],
-  config: {
-    screens: {
-      Home: '',
-      Tutorials: {
-        screens: {
-          TutorialsList: 'tutorials',
-          TutorialDetail: 'tutorials/:id',
-        },
-      },
-      Categories: {
-        screens: {
-          CategoriesList: 'categories',
-          CategoryDetail: 'categories/:id',
-        },
-      },
-      Materials: {
-        screens: {
-          MaterialsList: 'materials',
-          MaterialDetail: 'materials/:id',
-        },
-      },
-      Profile: {
-        screens: {
-          ProfileMain: 'profile',
-          Login: 'login',
-          Register: 'register',
-        },
-      },
-    },
-  },
-  getStateFromPath(path, options) {
-    const normalizedPath = path?.replace(/^assignment2\/api\//, '');
-    return getStateFromPathDefault(normalizedPath, options);
-  },
-};
 
 const screenOptions = {
   headerStyle: { backgroundColor: colors.surface },
@@ -109,7 +65,7 @@ function ProfileStack() {
 
 export default function AppNavigator() {
   return (
-    <NavigationContainer linking={linking}>
+    <NavigationContainer>
       <Tab.Navigator
         screenOptions={({ route }) => ({
           headerShown: false,

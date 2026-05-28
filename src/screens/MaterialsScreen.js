@@ -10,6 +10,7 @@ import {
   Modal,
   Pressable,
   Alert,
+  Share,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
@@ -118,10 +119,33 @@ export default function MaterialsScreen({ navigation }) {
     ]);
   };
 
+  const handleShare = async (mat) => {
+    await Share.share({
+      title: mat.name,
+      message: `Material: ${mat.name}\nPurchase source: ${mat.purchaseSource || 'N/A'}`,
+    });
+  };
+
+  const openQuickActions = (mat, isOwner) => {
+    const options = [{ text: 'View details', onPress: () => navigation.navigate('MaterialDetail', { id: mat._id }) }];
+    if (isOwner) {
+      options.push({ text: 'Edit material', onPress: () => openEdit(mat) });
+      options.push({ text: 'Delete material', style: 'destructive', onPress: () => handleDelete(mat) });
+    }
+    options.push({ text: 'Share material', onPress: () => handleShare(mat) });
+    options.push({ text: 'Cancel', style: 'cancel' });
+    Alert.alert(mat.name, 'Quick actions', options);
+  };
+
   const renderItem = ({ item }) => {
     const isOwner = String(item.owner) === String(userId);
     return (
-      <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('MaterialDetail', { id: item._id })}>
+      <Pressable
+        style={styles.card}
+        onPress={() => navigation.navigate('MaterialDetail', { id: item._id })}
+        onLongPress={() => openQuickActions(item, isOwner)}
+        delayLongPress={500}
+      >
         <View style={styles.cardHeader}>
           <Text style={styles.cardTitle}>{item.name}</Text>
           {isOwner && (
@@ -140,7 +164,7 @@ export default function MaterialsScreen({ navigation }) {
             {item.purchaseSource}
           </Text>
         ) : null}
-      </TouchableOpacity>
+      </Pressable>
     );
   };
 
