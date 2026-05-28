@@ -23,6 +23,38 @@ const SORT_OPTIONS = [
   { label: 'Most time spent', value: 'time_desc' },
 ];
 
+const DIFFICULTY_ORDER = { easy: 1, medium: 2, hard: 3 };
+
+function getDifficultyRank(value) {
+  if (!value) return Number.MAX_SAFE_INTEGER;
+  return DIFFICULTY_ORDER[String(value).toLowerCase()] ?? Number.MAX_SAFE_INTEGER;
+}
+
+function getTimeValue(item) {
+  const time = Number(item?.AverageTimeSpentMinutes);
+  return Number.isFinite(time) ? time : 0;
+}
+
+function sortTutorials(items, sortValue) {
+  const sorted = [...items];
+  switch (sortValue) {
+    case 'title_asc':
+      return sorted.sort((a, b) => String(a?.title || '').localeCompare(String(b?.title || '')));
+    case 'title_desc':
+      return sorted.sort((a, b) => String(b?.title || '').localeCompare(String(a?.title || '')));
+    case 'difficulty_asc':
+      return sorted.sort((a, b) => getDifficultyRank(a?.difficulty) - getDifficultyRank(b?.difficulty));
+    case 'difficulty_desc':
+      return sorted.sort((a, b) => getDifficultyRank(b?.difficulty) - getDifficultyRank(a?.difficulty));
+    case 'time_asc':
+      return sorted.sort((a, b) => getTimeValue(a) - getTimeValue(b));
+    case 'time_desc':
+      return sorted.sort((a, b) => getTimeValue(b) - getTimeValue(a));
+    default:
+      return sorted;
+  }
+}
+
 export default function TutorialsScreen({ navigation }) {
   const { token } = useAuth();
   const [tutorials, setTutorials] = useState([]);
@@ -43,7 +75,7 @@ export default function TutorialsScreen({ navigation }) {
     setError('');
     try {
       const result = await getTutorials({ page: p, search: s, sort: so });
-      setTutorials(result.tutorials);
+      setTutorials(sortTutorials(result.tutorials || [], so));
       setTotalPages(result.totalPages);
     } catch (e) {
       setError(e.message);
