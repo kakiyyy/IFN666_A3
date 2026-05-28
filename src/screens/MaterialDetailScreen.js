@@ -4,6 +4,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
 import { getMaterial, deleteMaterial } from '../services/materialService';
 import { colors } from '../constants/colors';
+import { buildShareMessage } from '../utils/shareMessages';
 
 export default function MaterialDetailScreen({ route, navigation }) {
   const { id } = route.params;
@@ -18,7 +19,7 @@ export default function MaterialDetailScreen({ route, navigation }) {
   }, [id]);
   useFocusEffect(useCallback(() => { load(); }, [load]));
   const isOwner = material && String(material.owner) === String(userId);
-  const onShare = async () => Share.share({ title: material.name, message: `Material: ${material.name}\nPurchase source: ${material.purchaseSource || 'N/A'}` });
+  const onShare = async () => Share.share({ title: material.name, message: buildShareMessage('material', material) });
 
   if (loading) return <View style={styles.center}><ActivityIndicator color={colors.primary} /></View>;
   if (error) return <View style={styles.center}><Text style={styles.error}>{error}</Text></View>;

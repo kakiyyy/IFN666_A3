@@ -10,6 +10,7 @@ import {
   Modal,
   Pressable,
   Alert,
+  Share,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
@@ -22,6 +23,7 @@ import {
 import Pagination from '../components/Pagination';
 import ErrorMessage from '../components/ErrorMessage';
 import { colors } from '../constants/colors';
+import { buildShareMessage } from '../utils/shareMessages';
 
 export default function CategoriesScreen({ navigation }) {
   const { token, userId } = useAuth();
@@ -118,18 +120,26 @@ export default function CategoriesScreen({ navigation }) {
     ]);
   };
 
+  const handleShare = async (cat) => {
+    await Share.share({
+      title: cat.name,
+      message: buildShareMessage('category', cat),
+    });
+  };
+
   const openQuickActions = (cat, isOwner) => {
     const options = [{ text: 'View details', onPress: () => navigation.navigate('CategoryDetail', { id: cat._id, name: cat.name }) }];
     if (isOwner) {
       options.push({ text: 'Edit category', onPress: () => openEdit(cat) });
       options.push({ text: 'Delete category', style: 'destructive', onPress: () => handleDelete(cat) });
     }
+    options.push({ text: 'Share category', onPress: () => handleShare(cat) });
     options.push({ text: 'Cancel', style: 'cancel' });
     Alert.alert(cat.name, 'Quick actions', options);
   };
 
   const renderItem = ({ item }) => {
-    const isOwner = String(item.owner) === String(userId);
+    const isOwner = Boolean(userId) && String(item.owner) === String(userId);
     return (
       <Pressable
         style={styles.card}
@@ -137,24 +147,18 @@ export default function CategoriesScreen({ navigation }) {
         onLongPress={() => openQuickActions(item, isOwner)}
         delayLongPress={500}
       >
-        <View style={styles.cardHeader}>
-          <Text style={styles.cardTitle}>{item.name}</Text>
-          {isOwner && (
-            <View style={styles.cardActions}>
-              <TouchableOpacity onPress={() => openEdit(item)} style={styles.iconBtn}>
-                <Text style={styles.editIcon}>✎</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleDelete(item)} style={styles.iconBtn}>
-                <Text style={styles.deleteIcon}>✕</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </View>
-        {item.description ? (
-          <Text style={styles.cardDesc} numberOfLines={2}>
-            {item.description}
-          </Text>
-        ) : null}
+        <Text style={styles.cardLine}><Text style={styles.cardLabel}>Title:</Text> {item.name}</Text>
+        <Text style={styles.cardLine} numberOfLines={2}><Text style={styles.cardLabel}>Description:</Text> {item.description || 'Not provided'}</Text>
+        {isOwner && (
+          <View style={styles.cardActions}>
+            <TouchableOpacity onPress={() => openEdit(item)} style={styles.actionBtn}>
+              <Text style={styles.editActionText}>Edit</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleDelete(item)} style={styles.actionBtn}>
+              <Text style={styles.deleteActionText}>Delete</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </Pressable>
     );
   };
@@ -271,13 +275,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  cardHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  cardTitle: { color: colors.text, fontSize: 16, fontWeight: '600', flex: 1 },
-  cardActions: { flexDirection: 'row', gap: 8 },
-  iconBtn: { padding: 4 },
-  editIcon: { color: colors.primary, fontSize: 16 },
-  deleteIcon: { color: colors.danger, fontSize: 16 },
-  cardDesc: { color: colors.muted, fontSize: 13, marginTop: 4 },
+  cardLine: { color: colors.text, fontSize: 14, marginBottom: 4 },
+  cardLabel: { fontWeight: '700', color: colors.primary },
+  cardActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 12, marginTop: 8 },
+  actionBtn: { paddingHorizontal: 6, paddingVertical: 4 },
+  editActionText: { color: colors.primary, fontWeight: '700' },
+  deleteActionText: { color: colors.danger, fontWeight: '700' },
   loader: { flex: 1 },
   errorText: { color: colors.danger, textAlign: 'center', margin: 24 },
   emptyText: { color: colors.muted, textAlign: 'center', marginTop: 40 },

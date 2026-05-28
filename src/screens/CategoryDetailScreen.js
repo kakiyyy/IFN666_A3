@@ -14,6 +14,7 @@ import { getCategory, getCategoryTutorials } from '../services/categoryService';
 import DifficultyBadge from '../components/DifficultyBadge';
 import Pagination from '../components/Pagination';
 import { colors } from '../constants/colors';
+import { buildShareMessage } from '../utils/shareMessages';
 
 export default function CategoryDetailScreen({ route, navigation }) {
   const { id } = route.params;
@@ -53,7 +54,7 @@ export default function CategoryDetailScreen({ route, navigation }) {
     if (!category) return;
     await Share.share({
       title: category.name,
-      message: `Category: ${category.name}\nDescription: ${category.description || 'N/A'}`,
+      message: buildShareMessage('category', { ...category, tutorials }),
     });
   };
 

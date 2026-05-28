@@ -23,6 +23,7 @@ import {
 import Pagination from '../components/Pagination';
 import ErrorMessage from '../components/ErrorMessage';
 import { colors } from '../constants/colors';
+import { buildShareMessage } from '../utils/shareMessages';
 
 export default function MaterialsScreen({ navigation }) {
   const { token, userId } = useAuth();
@@ -122,7 +123,7 @@ export default function MaterialsScreen({ navigation }) {
   const handleShare = async (mat) => {
     await Share.share({
       title: mat.name,
-      message: `Material: ${mat.name}\nPurchase source: ${mat.purchaseSource || 'N/A'}`,
+      message: buildShareMessage('material', mat),
     });
   };
 
@@ -138,7 +139,7 @@ export default function MaterialsScreen({ navigation }) {
   };
 
   const renderItem = ({ item }) => {
-    const isOwner = String(item.owner) === String(userId);
+    const isOwner = Boolean(userId) && String(item.owner) === String(userId);
     return (
       <Pressable
         style={styles.card}
@@ -146,24 +147,18 @@ export default function MaterialsScreen({ navigation }) {
         onLongPress={() => openQuickActions(item, isOwner)}
         delayLongPress={500}
       >
-        <View style={styles.cardHeader}>
-          <Text style={styles.cardTitle}>{item.name}</Text>
-          {isOwner && (
-            <View style={styles.cardActions}>
-              <TouchableOpacity onPress={() => openEdit(item)} style={styles.iconBtn}>
-                <Text style={styles.editIcon}>✎</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleDelete(item)} style={styles.iconBtn}>
-                <Text style={styles.deleteIcon}>✕</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </View>
-        {item.purchaseSource ? (
-          <Text style={styles.cardSource} numberOfLines={1}>
-            {item.purchaseSource}
-          </Text>
-        ) : null}
+        <Text style={styles.cardLine}><Text style={styles.cardLabel}>Title:</Text> {item.name}</Text>
+        <Text style={styles.cardLine} numberOfLines={1}><Text style={styles.cardLabel}>Purchase source:</Text> {item.purchaseSource || 'Not provided'}</Text>
+        {isOwner && (
+          <View style={styles.cardActions}>
+            <TouchableOpacity onPress={() => openEdit(item)} style={styles.actionBtn}>
+              <Text style={styles.editActionText}>Edit</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleDelete(item)} style={styles.actionBtn}>
+              <Text style={styles.deleteActionText}>Delete</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </Pressable>
     );
   };
@@ -278,13 +273,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  cardHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  cardTitle: { color: colors.text, fontSize: 16, fontWeight: '600', flex: 1 },
-  cardActions: { flexDirection: 'row', gap: 8 },
-  iconBtn: { padding: 4 },
-  editIcon: { color: colors.primary, fontSize: 16 },
-  deleteIcon: { color: colors.danger, fontSize: 16 },
-  cardSource: { color: colors.muted, fontSize: 13, marginTop: 4 },
+  cardLine: { color: colors.text, fontSize: 14, marginBottom: 4 },
+  cardLabel: { fontWeight: '700', color: colors.primary },
+  cardActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 12, marginTop: 8 },
+  actionBtn: { paddingHorizontal: 6, paddingVertical: 4 },
+  editActionText: { color: colors.primary, fontWeight: '700' },
+  deleteActionText: { color: colors.danger, fontWeight: '700' },
   loader: { flex: 1 },
   errorText: { color: colors.danger, textAlign: 'center', margin: 24 },
   emptyText: { color: colors.muted, textAlign: 'center', marginTop: 40 },

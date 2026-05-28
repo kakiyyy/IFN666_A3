@@ -16,6 +16,7 @@ import { useAuth } from '../context/AuthContext';
 import { getTutorials, deleteTutorial } from '../services/tutorialService';
 import Pagination from '../components/Pagination';
 import { colors } from '../constants/colors';
+import { buildShareMessage } from '../utils/shareMessages';
 
 const SORT_OPTIONS = [
   { label: 'Name A-Z', value: 'title_asc' },
@@ -123,10 +124,9 @@ export default function TutorialsScreen({ navigation }) {
   };
 
   const handleShare = async (item) => {
-    const cats = item.categories?.map((c) => c.name).join(', ') || 'None';
     await Share.share({
       title: item.title,
-      message: `${item.title}\nDifficulty: ${item.difficulty || 'N/A'}\nTime: ${item.AverageTimeSpentMinutes ?? 0} min\nCategories: ${cats}`,
+      message: buildShareMessage('tutorial', item),
     });
   };
 
@@ -142,20 +142,31 @@ export default function TutorialsScreen({ navigation }) {
   };
 
   const renderItem = ({ item }) => {
-    const isOwner = String(item.author) === String(userId);
+    const isOwner = Boolean(userId) && String(item.author) === String(userId);
     return (
-    <Pressable
-      style={styles.card}
-      onPress={() => navigation.navigate('TutorialDetail', { id: item._id })}
-      onLongPress={() => openQuickActions(item, isOwner)}
-      delayLongPress={500}
-    >
-      <Text style={styles.cardLine}><Text style={styles.cardLabel}>Title:</Text> {item.title}</Text>
-      <Text style={styles.cardLine}><Text style={styles.cardLabel}>Difficulty:</Text> {item.difficulty || 'N/A'}</Text>
-      <Text style={styles.cardLine}><Text style={styles.cardLabel}>Time:</Text> {item.AverageTimeSpentMinutes ?? 0} minutes</Text>
-      <Text style={styles.cardLine} numberOfLines={2}><Text style={styles.cardLabel}>Category:</Text> {item.categories?.length ? item.categories.map((c) => c.name).join(', ') : 'None'}</Text>
-    </Pressable>
-  )};
+      <Pressable
+        style={styles.card}
+        onPress={() => navigation.navigate('TutorialDetail', { id: item._id })}
+        onLongPress={() => openQuickActions(item, isOwner)}
+        delayLongPress={500}
+      >
+        <Text style={styles.cardLine}><Text style={styles.cardLabel}>Title:</Text> {item.title}</Text>
+        <Text style={styles.cardLine}><Text style={styles.cardLabel}>Difficulty:</Text> {item.difficulty || 'Not provided'}</Text>
+        <Text style={styles.cardLine}><Text style={styles.cardLabel}>Time:</Text> {item.AverageTimeSpentMinutes ?? 'Not provided'} minutes</Text>
+        <Text style={styles.cardLine} numberOfLines={2}><Text style={styles.cardLabel}>Category:</Text> {item.categories?.length ? item.categories.map((c) => c.name).join(', ') : 'Not provided'}</Text>
+        {isOwner && (
+          <View style={styles.cardActions}>
+            <TouchableOpacity onPress={() => navigation.navigate('TutorialForm', { id: item._id })} style={styles.actionBtn}>
+              <Text style={styles.editActionText}>Edit</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleDelete(item)} style={styles.actionBtn}>
+              <Text style={styles.deleteActionText}>Delete</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </Pressable>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -274,6 +285,10 @@ const styles = StyleSheet.create({
   },
   cardLine: { color: colors.text, fontSize: 14, marginBottom: 4 },
   cardLabel: { fontWeight: '700', color: colors.primary },
+  cardActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 12, marginTop: 8 },
+  actionBtn: { paddingHorizontal: 6, paddingVertical: 4 },
+  editActionText: { color: colors.primary, fontWeight: '700' },
+  deleteActionText: { color: colors.danger, fontWeight: '700' },
   loader: { flex: 1 },
   errorText: { color: colors.danger, textAlign: 'center', margin: 24 },
   emptyText: { color: colors.muted, textAlign: 'center', marginTop: 40 },

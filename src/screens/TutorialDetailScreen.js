@@ -14,6 +14,7 @@ import { useAuth } from '../context/AuthContext';
 import { getTutorial, deleteTutorial } from '../services/tutorialService';
 import DifficultyBadge from '../components/DifficultyBadge';
 import { colors } from '../constants/colors';
+import { buildShareMessage } from '../utils/shareMessages';
 
 export default function TutorialDetailScreen({ route, navigation }) {
   const { id } = route.params;
@@ -63,14 +64,10 @@ export default function TutorialDetailScreen({ route, navigation }) {
 
   const handleShare = async () => {
     if (!tutorial) return;
-    const cats = tutorial.categories?.map((c) => c.name).join(', ') || 'None';
-    const message =
-      `${tutorial.title}\n` +
-      `Difficulty: ${tutorial.difficulty}\n` +
-      `Time: ${tutorial.AverageTimeSpentMinutes} min\n` +
-      `Categories: ${cats}\n\n` +
-      `${tutorial.description}`;
-    await Share.share({ title: tutorial.title, message });
+    await Share.share({
+      title: tutorial.title,
+      message: buildShareMessage('tutorial', tutorial),
+    });
   };
 
   if (loading) {
