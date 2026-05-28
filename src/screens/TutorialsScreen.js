@@ -15,12 +15,12 @@ import Pagination from '../components/Pagination';
 import { colors } from '../constants/colors';
 
 const SORT_OPTIONS = [
-  { label: 'Name A-Z', value: 'name_asc' },
-  { label: 'Name Z-A', value: 'name_desc' },
-  { label: 'Difficulty ↑', value: 'difficulty_asc' },
-  { label: 'Difficulty ↓', value: 'difficulty_desc' },
-  { label: 'Time ↑', value: 'time_asc' },
-  { label: 'Time ↓', value: 'time_desc' },
+  { label: 'Name A-Z', value: 'title_asc' },
+  { label: 'Name Z-A', value: 'title_desc' },
+  { label: 'Difficulty: Easy to Hard', value: 'difficulty_asc' },
+  { label: 'Difficulty: Hard to Easy', value: 'difficulty_desc' },
+  { label: 'Least time spent', value: 'time_asc' },
+  { label: 'Most time spent', value: 'time_desc' },
 ];
 
 export default function TutorialsScreen({ navigation }) {
@@ -29,7 +29,7 @@ export default function TutorialsScreen({ navigation }) {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState('');
-  const [sort, setSort] = useState('name_asc');
+  const [sort, setSort] = useState('title_asc');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showSort, setShowSort] = useState(false);
