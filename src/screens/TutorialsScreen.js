@@ -17,6 +17,7 @@ import { getTutorials, deleteTutorial } from '../services/tutorialService';
 import Pagination from '../components/Pagination';
 import { colors } from '../constants/colors';
 import { buildShareMessage } from '../utils/shareMessages';
+import { displayList, displayValue } from '../utils/displayValue';
 
 const SORT_OPTIONS = [
   { label: 'Name A-Z', value: 'title_asc' },
@@ -150,10 +151,10 @@ export default function TutorialsScreen({ navigation }) {
         onLongPress={() => openQuickActions(item, isOwner)}
         delayLongPress={500}
       >
-        <Text style={styles.cardLine}><Text style={styles.cardLabel}>Title:</Text> {item.title}</Text>
-        <Text style={styles.cardLine}><Text style={styles.cardLabel}>Difficulty:</Text> {item.difficulty || 'Not provided'}</Text>
-        <Text style={styles.cardLine}><Text style={styles.cardLabel}>Time:</Text> {item.AverageTimeSpentMinutes ?? 'Not provided'} minutes</Text>
-        <Text style={styles.cardLine} numberOfLines={2}><Text style={styles.cardLabel}>Category:</Text> {item.categories?.length ? item.categories.map((c) => c.name).join(', ') : 'Not provided'}</Text>
+        <Text style={styles.cardLine}><Text style={styles.cardLabel}>Title:</Text> {displayValue(item.title)}</Text>
+        <Text style={styles.cardLine}><Text style={styles.cardLabel}>Difficulty:</Text> {displayValue(item.difficulty)}</Text>
+        <Text style={styles.cardLine}><Text style={styles.cardLabel}>Time:</Text> {displayValue(item.AverageTimeSpentMinutes)} minutes</Text>
+        <Text style={styles.cardLine} numberOfLines={2}><Text style={styles.cardLabel}>Category:</Text> {displayList(item.categories, (c) => c.name)}</Text>
         {isOwner && (
           <View style={styles.cardActions}>
             <TouchableOpacity onPress={() => navigation.navigate('TutorialForm', { id: item._id })} style={styles.actionBtn}>

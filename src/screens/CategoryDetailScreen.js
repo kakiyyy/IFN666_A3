@@ -15,6 +15,7 @@ import DifficultyBadge from '../components/DifficultyBadge';
 import Pagination from '../components/Pagination';
 import { colors } from '../constants/colors';
 import { buildShareMessage } from '../utils/shareMessages';
+import { displayValue } from '../utils/displayValue';
 
 export default function CategoryDetailScreen({ route, navigation }) {
   const { id } = route.params;
@@ -66,10 +67,10 @@ export default function CategoryDetailScreen({ route, navigation }) {
         params: { id: item._id },
       })}
     >
-      <Text style={styles.cardTitle}>{item.title}</Text>
+      <Text style={styles.cardTitle}>{displayValue(item.title)}</Text>
       <View style={styles.cardRow}>
         <DifficultyBadge difficulty={item.difficulty} />
-        <Text style={styles.cardMeta}>{item.AverageTimeSpentMinutes} min</Text>
+        <Text style={styles.cardMeta}>{displayValue(item.AverageTimeSpentMinutes)} min</Text>
       </View>
     </TouchableOpacity>
   );
@@ -94,10 +95,8 @@ export default function CategoryDetailScreen({ route, navigation }) {
     <View style={styles.container}>
       {category && (
         <View style={styles.header}>
-          <Text style={styles.title}>{category.name}</Text>
-          {category.description ? (
-            <Text style={styles.desc}>{category.description}</Text>
-          ) : null}
+          <Text style={styles.title}>{displayValue(category.name)}</Text>
+          <Text style={styles.desc}>{displayValue(category.description)}</Text>
           <TouchableOpacity style={styles.shareBtn} onPress={onShare}>
             <Text style={styles.shareBtnText}>Share</Text>
           </TouchableOpacity>

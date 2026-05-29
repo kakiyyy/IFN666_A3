@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { normaliseAuthToken } from '../services/apiClient';
 
 const AuthContext = createContext(null);
 
@@ -23,8 +24,9 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     Promise.all([AsyncStorage.getItem('token'), AsyncStorage.getItem('username')]).then(([t, u]) => {
       if (t) {
-        setToken(t);
-        const decoded = decodeJwt(t);
+        const rawToken = normaliseAuthToken(t);
+        setToken(rawToken);
+        const decoded = decodeJwt(rawToken);
         setUserId(decoded?.user_id ?? null);
       }
       if (u) setUsername(u);
@@ -33,9 +35,10 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (t, u) => {
-    await AsyncStorage.multiSet([['token', t], ['username', u ?? '']]);
-    setToken(t);
-    const decoded = decodeJwt(t);
+    const rawToken = normaliseAuthToken(t);
+    await AsyncStorage.multiSet([['token', rawToken], ['username', u ?? '']]);
+    setToken(rawToken);
+    const decoded = decodeJwt(rawToken);
     setUserId(decoded?.user_id ?? null);
     setUsername(u ?? null);
   };

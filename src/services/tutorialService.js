@@ -1,4 +1,5 @@
 import { BASE_URL } from '../constants/api';
+import { authHeaders } from './apiClient';
 
 function extractError(data) {
   if (data?.error) return data.error;
@@ -12,10 +13,6 @@ function parseLinkHeader(header) {
   return match ? parseInt(match[1], 10) : 1;
 }
 
-function authHeaders(token) {
-  if (!token) throw new Error('Please login first.');
-  return { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
-}
 
 async function parseResponseSafely(res, requestUrl) {
   const contentType = res.headers.get('content-type') || '';
