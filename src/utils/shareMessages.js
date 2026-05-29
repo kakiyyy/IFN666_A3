@@ -1,37 +1,25 @@
-const FALLBACK = 'Not provided';
-
-function valueOrFallback(value) {
-  if (value === null || value === undefined) return FALLBACK;
-  const text = String(value).trim();
-  return text.length > 0 ? text : FALLBACK;
-}
+import { FALLBACK_TEXT, displayList, displayValue } from './displayValue';
 
 function namesFromList(items, nestedKey) {
-  if (!Array.isArray(items) || items.length === 0) return FALLBACK;
-
-  const names = items
-    .map((item) => {
-      const source = nestedKey && item?.[nestedKey] ? item[nestedKey] : item;
-      return source?.name || source?.title || source;
-    })
-    .map((name) => String(name || '').trim())
-    .filter(Boolean);
-
-  return names.length > 0 ? names.join(', ') : FALLBACK;
+  return displayList(items, (item) => {
+    const source = nestedKey && item?.[nestedKey] ? item[nestedKey] : item;
+    return source?.name || source?.title || source;
+  });
 }
 
 function categoryTutorialDetails(item) {
   const tutorials = item?.tutorials || item?.tutorialList || item?.categoryTutorials;
   if (Array.isArray(tutorials)) {
-    return tutorials.length > 0 ? namesFromList(tutorials) : '0 tutorials';
+    return tutorials.length > 0 ? namesFromList(tutorials) : FALLBACK_TEXT;
   }
 
   const count = item?.tutorialCount ?? item?.tutorialsCount ?? item?.count;
   if (Number.isFinite(Number(count))) {
-    return `${Number(count)} tutorial${Number(count) === 1 ? '' : 's'}`;
+    const numericCount = Number(count);
+    return numericCount > 0 ? `${numericCount} tutorial${numericCount === 1 ? '' : 's'}` : FALLBACK_TEXT;
   }
 
-  return FALLBACK;
+  return FALLBACK_TEXT;
 }
 
 export function buildShareMessage(type, item = {}) {
@@ -41,19 +29,19 @@ export function buildShareMessage(type, item = {}) {
         'Handcraft Tutorial',
         'Tutorial',
         '',
-        `Tutorial title: ${valueOrFallback(item.title)}`,
-        `Difficulty: ${valueOrFallback(item.difficulty)}`,
-        `Time: ${valueOrFallback(item.AverageTimeSpentMinutes)}`,
+        `Tutorial title: ${displayValue(item.title)}`,
+        `Difficulty: ${displayValue(item.difficulty)}`,
+        `Time: ${displayValue(item.AverageTimeSpentMinutes)}`,
         `Categories: ${namesFromList(item.categories)}`,
-        `Materials: ${namesFromList(item.materials, 'material')}`,
+        `Materials: ${namesFromList(item.materials || item.material, 'material')}`,
       ].join('\n');
     case 'category':
       return [
         'Handcraft Tutorial',
         'Category',
         '',
-        `Category title: ${valueOrFallback(item.name || item.title)}`,
-        `Description: ${valueOrFallback(item.description)}`,
+        `Category title: ${displayValue(item.name || item.title)}`,
+        `Description: ${displayValue(item.description)}`,
         `Tutorial under the category: ${categoryTutorialDetails(item)}`,
       ].join('\n');
     case 'material':
@@ -61,15 +49,15 @@ export function buildShareMessage(type, item = {}) {
         'Handcraft Tutorial',
         'Material',
         '',
-        `Material title: ${valueOrFallback(item.name || item.title)}`,
-        `Purchase source: ${valueOrFallback(item.purchaseSource)}`,
+        `Material title: ${displayValue(item.name || item.title)}`,
+        `Purchase source: ${displayValue(item.purchaseSource)}`,
       ].join('\n');
     default:
       return [
         'Handcraft Tutorial',
-        valueOrFallback(type),
+        displayValue(type),
         '',
-        valueOrFallback(item.title || item.name),
+        displayValue(item.title || item.name),
       ].join('\n');
   }
 }

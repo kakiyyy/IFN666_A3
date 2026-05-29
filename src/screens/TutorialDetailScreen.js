@@ -15,6 +15,7 @@ import { getTutorial, deleteTutorial } from '../services/tutorialService';
 import DifficultyBadge from '../components/DifficultyBadge';
 import { colors } from '../constants/colors';
 import { buildShareMessage } from '../utils/shareMessages';
+import { displayList, displayValue } from '../utils/displayValue';
 
 export default function TutorialDetailScreen({ route, navigation }) {
   const { id } = route.params;
@@ -91,7 +92,7 @@ export default function TutorialDetailScreen({ route, navigation }) {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.headerRow}>
-        <Text style={styles.title}>{tutorial.title}</Text>
+        <Text style={styles.title}>{displayValue(tutorial.title)}</Text>
       </View>
       <TouchableOpacity onPress={handleShare} style={styles.shareBtn}>
         <Text style={styles.shareBtnText}>Share</Text>
@@ -99,49 +100,51 @@ export default function TutorialDetailScreen({ route, navigation }) {
 
       <View style={styles.metaRow}>
         <DifficultyBadge difficulty={tutorial.difficulty} />
-        <Text style={styles.metaText}>{tutorial.AverageTimeSpentMinutes} min</Text>
+        <Text style={styles.metaText}>{displayValue(tutorial.AverageTimeSpentMinutes)} min</Text>
       </View>
 
-      {tutorial.categories?.length > 0 && (
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Categories</Text>
+      <View style={styles.section}>
+        <Text style={styles.sectionLabel}>Categories</Text>
+        {tutorial.categories?.length > 0 ? (
           <View style={styles.tagRow}>
             {tutorial.categories.map((c) => (
               <Text key={c._id} style={styles.tag}>
-                {c.name}
+                {displayValue(c.name)}
               </Text>
             ))}
           </View>
-        </View>
-      )}
+        ) : (
+          <Text style={styles.body}>{displayList(tutorial.categories, (c) => c.name)}</Text>
+        )}
+      </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionLabel}>Description</Text>
-        <Text style={styles.body}>{tutorial.description}</Text>
+        <Text style={styles.body}>{displayValue(tutorial.description)}</Text>
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionLabel}>Instructions</Text>
-        <Text style={styles.body}>{tutorial.instructions}</Text>
+        <Text style={styles.body}>{displayValue(tutorial.instructions)}</Text>
       </View>
 
-      {tutorial.material?.length > 0 && (
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Materials</Text>
-          {tutorial.material.map((m, i) => (
+      <View style={styles.section}>
+        <Text style={styles.sectionLabel}>Materials</Text>
+        {tutorial.material?.length > 0 ? (
+          tutorial.material.map((m, i) => (
             <View key={i} style={styles.materialRow}>
-              <Text style={styles.materialName}>{m.material?.name}</Text>
+              <Text style={styles.materialName}>{displayValue(m.material?.name)}</Text>
               <Text style={styles.materialDetail}>
-                {m.quantity} {m.unit}
+                {displayValue(m.quantity)} {displayValue(m.unit)}
                 {m.note ? ` — ${m.note}` : ''}
               </Text>
-              {m.material?.purchaseSource ? (
-                <Text style={styles.materialSource}>{m.material.purchaseSource}</Text>
-              ) : null}
+              <Text style={styles.materialSource}>{displayValue(m.material?.purchaseSource)}</Text>
             </View>
-          ))}
-        </View>
-      )}
+          ))
+        ) : (
+          <Text style={styles.body}>{displayValue(null)}</Text>
+        )}
+      </View>
 
       {isOwner && (
         <View style={styles.actionsRow}>

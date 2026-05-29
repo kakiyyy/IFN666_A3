@@ -24,6 +24,7 @@ import Pagination from '../components/Pagination';
 import ErrorMessage from '../components/ErrorMessage';
 import { colors } from '../constants/colors';
 import { buildShareMessage } from '../utils/shareMessages';
+import { displayValue } from '../utils/displayValue';
 
 export default function MaterialsScreen({ navigation }) {
   const { token, userId } = useAuth();
@@ -147,8 +148,8 @@ export default function MaterialsScreen({ navigation }) {
         onLongPress={() => openQuickActions(item, isOwner)}
         delayLongPress={500}
       >
-        <Text style={styles.cardLine}><Text style={styles.cardLabel}>Title:</Text> {item.name}</Text>
-        <Text style={styles.cardLine} numberOfLines={1}><Text style={styles.cardLabel}>Purchase source:</Text> {item.purchaseSource || 'Not provided'}</Text>
+        <Text style={styles.cardLine}><Text style={styles.cardLabel}>Title:</Text> {displayValue(item.name)}</Text>
+        <Text style={styles.cardLine} numberOfLines={1}><Text style={styles.cardLabel}>Purchase source:</Text> {displayValue(item.purchaseSource)}</Text>
         {isOwner && (
           <View style={styles.cardActions}>
             <TouchableOpacity onPress={() => openEdit(item)} style={styles.actionBtn}>
