@@ -7,10 +7,11 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Share,
+  Alert,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
-import { getCategory, getCategoryTutorials } from '../services/categoryService';
+import { getCategory, getCategoryTutorials, deleteCategory } from '../services/categoryService';
 import DifficultyBadge from '../components/DifficultyBadge';
 import Pagination from '../components/Pagination';
 import { colors } from '../constants/colors';
@@ -19,7 +20,7 @@ import { displayValue } from '../utils/displayValue';
 
 export default function CategoryDetailScreen({ route, navigation }) {
   const { id } = route.params;
-  const { token } = useAuth();
+  const { token, userId } = useAuth();
   const [category, setCategory] = useState(null);
   const [tutorials, setTutorials] = useState([]);
   const [page, setPage] = useState(1);
@@ -50,6 +51,26 @@ export default function CategoryDetailScreen({ route, navigation }) {
       load();
     }, [load])
   );
+
+  const isOwner = Boolean(userId) && category && String(category.owner) === String(userId);
+
+  const handleDelete = () => {
+    Alert.alert('Delete Category', 'Are you sure you want to delete this category?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await deleteCategory(token, id);
+            navigation.navigate('CategoriesList');
+          } catch (e) {
+            Alert.alert('Error', e.message);
+          }
+        },
+      },
+    ]);
+  };
 
   const onShare = async () => {
     if (!category) return;
@@ -100,6 +121,22 @@ export default function CategoryDetailScreen({ route, navigation }) {
           <TouchableOpacity style={styles.shareBtn} onPress={onShare}>
             <Text style={styles.shareBtnText}>Share</Text>
           </TouchableOpacity>
+          {isOwner && (
+            <View style={styles.actionsRow}>
+              <TouchableOpacity
+                style={[styles.actionBtn, styles.editBtn]}
+                onPress={() => navigation.navigate('CategoriesList', { editCategory: category })}
+              >
+                <Text style={styles.actionBtnText}>Edit</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.actionBtn, styles.deleteBtn]}
+                onPress={handleDelete}
+              >
+                <Text style={styles.actionBtnText}>Delete</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       )}
 
@@ -136,6 +173,11 @@ const styles = StyleSheet.create({
   desc: { color: colors.muted, fontSize: 14, marginBottom: 10 },
   shareBtn: { backgroundColor: colors.primary, borderRadius: 8, paddingVertical: 10, alignItems: 'center' },
   shareBtnText: { color: '#fff', fontWeight: '700' },
+  actionsRow: { flexDirection: 'row', gap: 10, marginTop: 12 },
+  actionBtn: { flex: 1, borderRadius: 8, paddingVertical: 12, alignItems: 'center' },
+  editBtn: { backgroundColor: colors.primary },
+  deleteBtn: { backgroundColor: colors.danger },
+  actionBtnText: { color: '#fff', fontWeight: '700' },
   sectionLabel: {
     color: colors.primary,
     fontWeight: '600',

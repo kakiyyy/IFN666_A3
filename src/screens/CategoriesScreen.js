@@ -26,7 +26,7 @@ import { colors } from '../constants/colors';
 import { buildShareMessage } from '../utils/shareMessages';
 import { displayValue } from '../utils/displayValue';
 
-export default function CategoriesScreen({ navigation }) {
+export default function CategoriesScreen({ route, navigation }) {
   const { token, userId } = useAuth();
   const [categories, setCategories] = useState([]);
   const [page, setPage] = useState(1);
@@ -63,8 +63,14 @@ export default function CategoriesScreen({ navigation }) {
 
   useFocusEffect(
     useCallback(() => {
+      const editCategory = route.params?.editCategory;
+      if (editCategory) {
+        const canEdit = Boolean(userId) && String(editCategory.owner) === String(userId);
+        if (canEdit) openEdit(editCategory);
+        navigation.setParams({ editCategory: undefined });
+      }
       load();
-    }, [load, page, search, sort])
+    }, [load, page, search, sort, route.params?.editCategory])
   );
 
   const openCreate = () => {

@@ -28,7 +28,7 @@ export default function MaterialDetailScreen({ route, navigation }) {
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
-  const isOwner = material && String(material.owner) === String(userId);
+  const isOwner = Boolean(userId) && material && String(material.owner) === String(userId);
 
   const onShare = async () => {
     if (!material) return;
@@ -36,15 +36,15 @@ export default function MaterialDetailScreen({ route, navigation }) {
   };
 
   const onDelete = () => {
-    Alert.alert('Delete Material', 'Are you sure?', [
-      { text: 'Cancel' },
+    Alert.alert('Delete Material', 'Are you sure you want to delete this material?', [
+      { text: 'Cancel', style: 'cancel' },
       {
         text: 'Delete',
         style: 'destructive',
         onPress: async () => {
           try {
             await deleteMaterial(token, id);
-            navigation.goBack();
+            navigation.navigate('MaterialsList');
           } catch (e) {
             Alert.alert('Error', e.message);
           }
@@ -64,9 +64,20 @@ export default function MaterialDetailScreen({ route, navigation }) {
         <Text style={styles.shareText}>Share</Text>
       </TouchableOpacity>
       {isOwner && (
-        <TouchableOpacity style={styles.delete} onPress={onDelete}>
-          <Text style={styles.shareText}>Delete</Text>
-        </TouchableOpacity>
+        <View style={styles.actionsRow}>
+          <TouchableOpacity
+            style={[styles.actionBtn, styles.editBtn]}
+            onPress={() => navigation.navigate('MaterialsList', { editMaterial: material })}
+          >
+            <Text style={styles.actionBtnText}>Edit</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.actionBtn, styles.deleteBtn]}
+            onPress={onDelete}
+          >
+            <Text style={styles.actionBtnText}>Delete</Text>
+          </TouchableOpacity>
+        </View>
       )}
     </View>
   );
@@ -78,7 +89,11 @@ const styles = StyleSheet.create({
   title: { color: colors.text, fontSize: 24, fontWeight: '700', marginBottom: 12 },
   text: { color: colors.text },
   share: { backgroundColor: colors.primary, padding: 12, borderRadius: 8, marginTop: 20 },
-  delete: { backgroundColor: colors.danger, padding: 12, borderRadius: 8, marginTop: 10 },
   shareText: { color: '#fff', textAlign: 'center', fontWeight: '700' },
+  actionsRow: { flexDirection: 'row', gap: 10, marginTop: 12 },
+  actionBtn: { flex: 1, borderRadius: 8, paddingVertical: 12, alignItems: 'center' },
+  editBtn: { backgroundColor: colors.primary },
+  deleteBtn: { backgroundColor: colors.danger },
+  actionBtnText: { color: '#fff', fontWeight: '700' },
   error: { color: colors.danger },
 });

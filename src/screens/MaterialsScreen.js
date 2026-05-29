@@ -26,7 +26,7 @@ import { colors } from '../constants/colors';
 import { buildShareMessage } from '../utils/shareMessages';
 import { displayValue } from '../utils/displayValue';
 
-export default function MaterialsScreen({ navigation }) {
+export default function MaterialsScreen({ route, navigation }) {
   const { token, userId } = useAuth();
   const [materials, setMaterials] = useState([]);
   const [page, setPage] = useState(1);
@@ -63,8 +63,14 @@ export default function MaterialsScreen({ navigation }) {
 
   useFocusEffect(
     useCallback(() => {
+      const editMaterial = route.params?.editMaterial;
+      if (editMaterial) {
+        const canEdit = Boolean(userId) && String(editMaterial.owner) === String(userId);
+        if (canEdit) openEdit(editMaterial);
+        navigation.setParams({ editMaterial: undefined });
+      }
       load();
-    }, [load, page, search, sort])
+    }, [load, page, search, sort, route.params?.editMaterial])
   );
 
   const openCreate = () => {
