@@ -25,5 +25,9 @@ export async function login(username, password) {
   });
   const data = await res.json();
   if (!res.ok) throw new Error(extractError(data));
-  return data.token;
+
+  return {
+    token: data.token,
+    username: data.username ?? data.user?.username ?? username,
+  };
 }
