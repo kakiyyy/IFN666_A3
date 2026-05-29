@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Alert,
   View,
   Text,
   TextInput,
@@ -16,7 +15,7 @@ import ErrorMessage from '../components/ErrorMessage';
 import { colors } from '../constants/colors';
 
 export default function LoginScreen({ navigation }) {
-  const { login: setToken } = useAuth();
+  const { login: saveSession } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -30,14 +29,13 @@ export default function LoginScreen({ navigation }) {
     }
     setLoading(true);
     try {
-      const token = await login(username.trim(), password);
-      await setToken(token, username.trim());
-      Alert.alert('Success', 'Login successful', [
-        {
-          text: 'OK',
-          onPress: () => navigation.getParent()?.navigate('Home'),
-        },
-      ]);
+      const auth = await login(username.trim(), password);
+      await saveSession(auth.token, auth.username ?? username.trim());
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'ProfileMain' }],
+      });
+      navigation.getParent()?.navigate('Profile');
     } catch (e) {
       setError(e.message);
     } finally {
