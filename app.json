@@ -1,16 +1,16 @@
 {
   "expo": {
-    "name": "Kaki",
-    "slug": "kaki",
+    "name": "Handcraft Tutorial",
+    "slug": "Handcraft Tutorial",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/handcraft.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#e1e9e1"
     },
     "ios": { "supportsTablet": true },
     "android": {
