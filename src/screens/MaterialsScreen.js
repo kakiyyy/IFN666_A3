@@ -200,7 +200,15 @@ export default function MaterialsScreen({ route, navigation }) {
       {loading ? (
         <ActivityIndicator style={styles.loader} color={colors.primary} size="large" />
       ) : error ? (
-        <Text style={styles.errorText}>{error}</Text>
+        <View style={styles.serverErrorState}>
+          <Text style={styles.serverErrorTitle}>Server unavailable</Text>
+          <Text style={styles.serverErrorMessage}>
+            We could not connect to the server. Please check your internet connection or try again later.
+          </Text>
+          <TouchableOpacity style={styles.retryButton} onPress={load}>
+            <Text style={styles.retryButtonText}>Try Again</Text>
+          </TouchableOpacity>
+        </View>
       ) : (
         <FlatList
           data={materials}
@@ -287,7 +295,11 @@ const styles = StyleSheet.create({
   editActionText: { color: colors.primary, fontWeight: '700' },
   deleteActionText: { color: colors.danger, fontWeight: '700' },
   loader: { flex: 1 },
-  errorText: { color: colors.danger, textAlign: 'center', margin: 24 },
+  serverErrorState: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
+  serverErrorTitle: { color: colors.text, fontSize: 20, fontWeight: '700', marginBottom: 8 },
+  serverErrorMessage: { color: colors.muted, textAlign: 'center', lineHeight: 20, marginBottom: 16 },
+  retryButton: { backgroundColor: colors.primary, borderRadius: 8, paddingHorizontal: 20, paddingVertical: 12 },
+  retryButtonText: { color: '#fff', fontWeight: '700' },
   emptyText: { color: colors.muted, textAlign: 'center', marginTop: 40 },
   fab: {
     position: 'absolute',

@@ -82,7 +82,13 @@ export default function TutorialDetailScreen({ route, navigation }) {
   if (error) {
     return (
       <View style={styles.center}>
-        <Text style={styles.errorText}>{error}</Text>
+        <Text style={styles.serverErrorTitle}>Server unavailable</Text>
+        <Text style={styles.serverErrorMessage}>
+          We could not connect to the server. Please check your internet connection or try again later.
+        </Text>
+        <TouchableOpacity style={styles.retryButton} onPress={load}>
+          <Text style={styles.retryButtonText}>Try Again</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -206,5 +212,8 @@ const styles = StyleSheet.create({
   editBtn: { backgroundColor: colors.primary },
   deleteBtn: { backgroundColor: colors.danger },
   actionBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
-  errorText: { color: colors.danger },
+  serverErrorTitle: { color: colors.text, fontSize: 20, fontWeight: '700', marginBottom: 8 },
+  serverErrorMessage: { color: colors.muted, textAlign: 'center', lineHeight: 20, marginBottom: 16, paddingHorizontal: 24 },
+  retryButton: { backgroundColor: colors.primary, borderRadius: 8, paddingHorizontal: 20, paddingVertical: 12 },
+  retryButtonText: { color: '#fff', fontWeight: '700' },
 });
