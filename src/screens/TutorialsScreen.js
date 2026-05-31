@@ -29,6 +29,7 @@ const SORT_OPTIONS = [
 ];
 
 const DIFFICULTY_ORDER = { easy: 1, medium: 2, hard: 3 };
+const NAME_SORTS = ['title_asc', 'title_desc'];
 
 const getText = (value) => String(value || '').trim().toLowerCase();
 
@@ -81,9 +82,28 @@ export default function TutorialsScreen({ navigation }) {
     setLoading(true);
     setError('');
     try {
-      const result = await getTutorials({ page: p, search: s, sort: so });
-      setTutorials(sortTutorials(result.tutorials || [], so));
-      setTotalPages(result.totalPages);
+      if (NAME_SORTS.includes(so)) {
+        const firstPage = await getTutorials({ page: 1, search: s, sort: so });
+        const remainingPages = await Promise.all(
+          Array.from({ length: firstPage.totalPages - 1 }, (_, index) =>
+            getTutorials({ page: index + 2, search: s, sort: so })
+          )
+        );
+        const pageSize = Math.max((firstPage.tutorials || []).length, 1);
+        const allTutorials = [firstPage, ...remainingPages].flatMap((result) => result.tutorials || []);
+        const sortedTutorials = sortTutorials(allTutorials, so);
+        const nextTotalPages = Math.max(Math.ceil(sortedTutorials.length / pageSize), 1);
+        const nextPage = Math.min(p, nextTotalPages);
+        const start = (nextPage - 1) * pageSize;
+
+        setTutorials(sortedTutorials.slice(start, start + pageSize));
+        setTotalPages(nextTotalPages);
+        if (nextPage !== p) setPage(nextPage);
+      } else {
+        const result = await getTutorials({ page: p, search: s, sort: so });
+        setTutorials(sortTutorials(result.tutorials || [], so));
+        setTotalPages(result.totalPages);
+      }
     } catch (e) {
       setError(e.message);
     } finally {

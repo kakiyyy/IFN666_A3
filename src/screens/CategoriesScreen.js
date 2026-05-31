@@ -62,14 +62,28 @@ export default function CategoriesScreen({ route, navigation }) {
   const stateRef = useRef({ page, search, sort });
   stateRef.current = { page, search, sort };
 
-  const load = useCallback(async () => {
-    const { page: p, search: s, sort: so } = stateRef.current;
+  const load = useCallback(async (requestedPage) => {
+    const { page: currentPage, search: s, sort: so } = stateRef.current;
+    const p = requestedPage ?? currentPage;
     setLoading(true);
     setError('');
     try {
-      const result = await getCategories({ page: p, search: s, sort: so });
-      setCategories(sortCategories(result.categories || [], so));
-      setTotalPages(result.totalPages);
+      const firstPage = await getCategories({ page: 1, search: s, sort: so });
+      const remainingPages = await Promise.all(
+        Array.from({ length: firstPage.totalPages - 1 }, (_, index) =>
+          getCategories({ page: index + 2, search: s, sort: so })
+        )
+      );
+      const pageSize = Math.max((firstPage.categories || []).length, 1);
+      const allCategories = [firstPage, ...remainingPages].flatMap((result) => result.categories || []);
+      const sortedCategories = sortCategories(allCategories, so);
+      const nextTotalPages = Math.max(Math.ceil(sortedCategories.length / pageSize), 1);
+      const nextPage = Math.min(p, nextTotalPages);
+      const start = (nextPage - 1) * pageSize;
+
+      setCategories(sortedCategories.slice(start, start + pageSize));
+      setTotalPages(nextTotalPages);
+      if (nextPage !== currentPage) setPage(nextPage);
     } catch (e) {
       setError(e.message);
     } finally {
@@ -117,7 +131,7 @@ export default function CategoriesScreen({ route, navigation }) {
       }
       setModalVisible(false);
       setPage(1);
-      load();
+      load(1);
     } catch (e) {
       setFormError(e.message);
     } finally {
