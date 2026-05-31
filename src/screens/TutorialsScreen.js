@@ -30,6 +30,8 @@ const SORT_OPTIONS = [
 
 const DIFFICULTY_ORDER = { easy: 1, medium: 2, hard: 3 };
 
+const getText = (value) => String(value || '').trim().toLowerCase();
+
 function getDifficultyRank(value) {
   if (!value) return Number.MAX_SAFE_INTEGER;
   return DIFFICULTY_ORDER[String(value).toLowerCase()] ?? Number.MAX_SAFE_INTEGER;
@@ -44,9 +46,9 @@ function sortTutorials(items, sortValue) {
   const sorted = [...items];
   switch (sortValue) {
     case 'title_asc':
-      return sorted.sort((a, b) => String(a?.title || '').localeCompare(String(b?.title || '')));
+      return sorted.sort((a, b) => getText(a?.title).localeCompare(getText(b?.title)));
     case 'title_desc':
-      return sorted.sort((a, b) => String(b?.title || '').localeCompare(String(a?.title || '')));
+      return sorted.sort((a, b) => getText(b?.title).localeCompare(getText(a?.title)));
     case 'difficulty_asc':
       return sorted.sort((a, b) => getDifficultyRank(a?.difficulty) - getDifficultyRank(b?.difficulty));
     case 'difficulty_desc':

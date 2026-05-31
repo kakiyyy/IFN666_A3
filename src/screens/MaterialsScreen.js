@@ -26,6 +26,22 @@ import { colors } from '../constants/colors';
 import { buildShareMessage } from '../utils/shareMessages';
 import { displayValue } from '../utils/displayValue';
 
+const getText = (value) => String(value || '').trim().toLowerCase();
+
+const sortMaterials = (items, sortOption) => {
+  const sorted = [...items];
+
+  if (sortOption === 'name_asc') {
+    return sorted.sort((a, b) => getText(a?.name).localeCompare(getText(b?.name)));
+  }
+
+  if (sortOption === 'name_desc') {
+    return sorted.sort((a, b) => getText(b?.name).localeCompare(getText(a?.name)));
+  }
+
+  return sorted;
+};
+
 export default function MaterialsScreen({ route, navigation }) {
   const { token, userId } = useAuth();
   const [materials, setMaterials] = useState([]);
@@ -52,7 +68,7 @@ export default function MaterialsScreen({ route, navigation }) {
     setError('');
     try {
       const result = await getMaterials({ page: p, search: s, sort: so });
-      setMaterials(result.materials);
+      setMaterials(sortMaterials(result.materials || [], so));
       setTotalPages(result.totalPages);
     } catch (e) {
       setError(e.message);
