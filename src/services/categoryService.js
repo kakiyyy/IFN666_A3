@@ -14,8 +14,9 @@ function parseLinkHeader(header) {
 }
 
 
-export async function getCategories({ page = 1, search = '', sort = 'name_asc' } = {}) {
-  const params = new URLSearchParams({ page: String(page), sort });
+export async function getCategories({ page = 1, search = '', sort = '' } = {}) {
+  const params = new URLSearchParams({ page: String(page) });
+  if (sort && sort !== 'name_asc' && sort !== 'name_desc') params.set('sort', sort);
   if (search) params.set('search', search);
   const res = await fetch(`${BASE_URL}/categories?${params}`);
   const data = await res.json();
