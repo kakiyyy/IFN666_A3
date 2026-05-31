@@ -171,19 +171,21 @@ Before recording the demo video, test:
 
 The app is not currently multi-tenant, but it could be changed to support multiple organisations.
 
-A tenant could be a school, training provider, or organisation using the same app.
+A tenant could be a seprate group using the same app.
 
 The best model for this project would be a shared database with a tenantId field. Each user, category, material, and tutorial would store which tenant it belongs to.
 
 Example:
 
-js {   title: "React Native Basics",   difficulty: "Easy",   tenantId: "tenant001" } 
+#js {   title: "handcraft",   difficulty: "Easy", ......  tenantId: "tenant001" } 
 
 After login, the server could identify the tenant from the user’s authentication token. The backend would then only return data that matches that tenant.
 
-For example:
+#Authorization: Bearer <token> 
 
-js Tutorial.find({ tenantId: req.user.tenantId }); 
+For example:
+#js const mat = allMaterials.find((m) => m._id === entry.materialId); 
+#js Materials.find({ tenantId: req.user.tenantId }); 
 
 This prevents one tenant from viewing or modifying another tenant’s data.
 
