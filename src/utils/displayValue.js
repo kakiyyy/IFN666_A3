@@ -1,5 +1,9 @@
 export const FALLBACK_TEXT = 'N/A';
 
+export function hasValue(value) {
+  return value !== null && value !== undefined && String(value).trim() !== '';
+}
+
 export function displayValue(value) {
   if (value === null || value === undefined) return FALLBACK_TEXT;
   const text = String(value).trim();
