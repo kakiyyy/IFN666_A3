@@ -15,7 +15,7 @@ import { getTutorial, deleteTutorial } from '../services/tutorialService';
 import DifficultyBadge from '../components/DifficultyBadge';
 import { colors } from '../constants/colors';
 import { buildShareMessage } from '../utils/shareMessages';
-import { displayList, displayValue } from '../utils/displayValue';
+import { displayList, displayValue, hasValue } from '../utils/displayValue';
 
 export default function TutorialDetailScreen({ route, navigation }) {
   const { id } = route.params;
@@ -137,16 +137,29 @@ export default function TutorialDetailScreen({ route, navigation }) {
       <View style={styles.section}>
         <Text style={styles.sectionLabel}>Materials</Text>
         {tutorial.material?.length > 0 ? (
-          tutorial.material.map((m, i) => (
-            <View key={i} style={styles.materialRow}>
-              <Text style={styles.materialName}>{displayValue(m.material?.name)}</Text>
-              <Text style={styles.materialDetail}>
-                {displayValue(m.quantity)} {displayValue(m.unit)}
-                {m.note ? ` — ${m.note}` : ''}
-              </Text>
-              <Text style={styles.materialSource}>{displayValue(m.material?.purchaseSource)}</Text>
-            </View>
-          ))
+          tutorial.material.map((m, i) => {
+            const materialName = m.material?.name || m.material?.title || m.name || m.title;
+            const purchaseSource = m.material?.purchaseSource ?? m.purchaseSource;
+
+            return (
+              <View key={i} style={styles.materialRow}>
+                {hasValue(materialName) && (
+                  <Text style={styles.materialName}>name: {materialName}</Text>
+                )}
+                {hasValue(m.quantity) && (
+                  <Text style={styles.materialDetail}>
+                    quantity: {m.quantity}{hasValue(m.unit) ? ` ${m.unit}` : ''}
+                  </Text>
+                )}
+                {hasValue(m.note) && (
+                  <Text style={styles.materialDetail}>note: {m.note}</Text>
+                )}
+                {hasValue(purchaseSource) && (
+                  <Text style={styles.materialSource}>purchaseSource: {purchaseSource}</Text>
+                )}
+              </View>
+            );
+          })
         ) : (
           <Text style={styles.body}>{displayValue(null)}</Text>
         )}
